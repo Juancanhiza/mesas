@@ -1,6 +1,8 @@
 const db = require("../models");
 const Mesa = db.Mesa;
 const Restaurante = db.Restaurante;
+const Cliente = db.Cliente;
+const Reserva = db.Reserva;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
@@ -50,6 +52,22 @@ exports.findOne = (req, res) => {
 exports.findAll = (req, res) => {
     const nombre = req.query.nombre;
     var condition = nombre ? { nombre: { [Op.iLike]: `%${nombre}%` } } : null;
+
+    Mesa.findAll({ where: condition })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Ocurrio un error al obtener las mesas."
+            });
+        });
+};
+
+exports.findAllByRestaurante = (req, res) => {
+    const restauranteId = req.params.restauranteId;
+    var condition = restauranteId ? { restauranteId: { [Op.eq]: restauranteId } } : null;
 
     Mesa.findAll({ where: condition })
         .then(data => {
@@ -138,3 +156,54 @@ function validarMesa(req){
     };
 
 }
+
+exports.findAvailable = (req, res) => {
+    const restaurante = req.body.restauranteId;
+    const fechaString = req.body.fecha;
+    const horario = req.body.horario;
+    let fecha = Date.parse(fechaString);
+
+    Reserva.findAll({
+        where: {
+            restauranteId: restaurante,
+            fecha: {
+                [Op.eq]: fecha
+            },
+            horario: horario
+        }
+    })
+    .then(reservasActuales => {
+        /* Vemos que mesas están reservadas, asignando a un array el id de las mesas 
+        /* de las reservas obtenidas. 
+        */
+        var mesasOcupadas = [];
+        reservasActuales.map( reserva => {
+            mesasOcupadas.push(reserva.mesaId);
+        });
+
+        /* Obtenemos todas las mesas del restaurante */
+        Mesa.findAll({ restauranteId: restaurante })
+        .then(totalMesas => {
+            /* Una vez tenemos todas las mesas, filtramos las que no estan ocupadas
+            *  y devolvemos las disponibles.
+            */
+            var mesasDisponibles = totalMesas.filter(
+                mesa => !mesasOcupadas.includes(mesa.id)
+            );
+            res.send(mesasDisponibles);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Ocurrio un error al realizar la operacion."
+            });
+        });
+    })
+    .catch(err => {
+        res.status(500).send({
+            message:
+                err.message || "Ocurrio un error al obtener las mesas."
+        });
+    });
+
+};

@@ -31,19 +31,25 @@ db.Restaurante.hasMany(db.Mesa, {
 
 // Reservas
 
-db.Restaurante.hasOne(db.Reserva, {
+/* db.Restaurante.hasOne(db.Reserva, {
   foreignKey: 'restauranteId'
+}); */
+db.Reserva.belongsTo(db.Restaurante, { 
+  foreignKey: "restauranteId"
 });
-//db.Reserva.belongsTo(db.Restaurante);
 
-db.Cliente.hasOne(db.Reserva, {
+/* db.Cliente.hasOne(db.Reserva, {
+  foreignKey: "clienteId"
+}); */
+db.Reserva.belongsTo(db.Cliente, { 
   foreignKey: "clienteId"
 });
-//db.Reserva.belongsTo(db.Cliente);
 
-db.Mesa.hasOne(db.Reserva, { 
+/* db.Mesa.hasOne(db.Reserva, { 
+  foreignKey: "mesaId"
+}); */
+db.Reserva.belongsTo(db.Mesa, { 
   foreignKey: "mesaId"
 });
-//db.Reserva.belongsTo(db.Mesa);
 
 module.exports = db;

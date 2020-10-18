@@ -1,6 +1,5 @@
 const db = require("../models");
 const Reserva = db.Reserva;
-const Restaurante = db.Restaurante;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
