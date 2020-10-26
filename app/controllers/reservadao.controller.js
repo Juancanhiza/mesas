@@ -65,21 +65,34 @@ exports.findAll = (req, res) => {
 
 exports.filter = (req, res) => {
     const restaurante = req.body.restauranteId;
-    //var condition1 = restaurante ? { restauranteId: { [Op.eq]: restauranteId } } : null;
     const fechaString = req.body.fecha;
-    //var condition2 = fecha ? { fecha: { [Op.eq]: fecha } } : null;
-    //let fecha = Date.parse(fechaString);
-    console.log("La fecha es:", fechaString);
-    let fecha = new Date(fechaString);
-    console.log("La fecha en datetime es:", fecha);
+    const clienteId = req.body.clienteId;
+    var condition = null;
+    let fecha = Date.parse(fechaString);
 
-    Reserva.findAll({
-        where: {
+    if (clienteId) {
+        condition = {
             restauranteId: restaurante,
             fecha: {
                 [Op.eq]: fecha
             },
+            clienteId: clienteId
         }
+    }else{
+        condition = {
+            restauranteId: restaurante,
+            fecha: {
+                [Op.eq]: fecha
+            }
+        }
+    }
+    
+    Reserva.findAll({
+        where: condition,
+        order: [
+            ['horario'],
+            ['mesaId']
+        ]
     })
         .then(data => {
             res.send(data);
