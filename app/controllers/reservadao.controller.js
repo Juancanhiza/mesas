@@ -63,6 +63,35 @@ exports.findAll = (req, res) => {
         });
 };
 
+exports.filter = (req, res) => {
+    const restaurante = req.body.restauranteId;
+    //var condition1 = restaurante ? { restauranteId: { [Op.eq]: restauranteId } } : null;
+    const fechaString = req.body.fecha;
+    //var condition2 = fecha ? { fecha: { [Op.eq]: fecha } } : null;
+    //let fecha = Date.parse(fechaString);
+    console.log("La fecha es:", fechaString);
+    let fecha = new Date(fechaString);
+    console.log("La fecha en datetime es:", fecha);
+
+    Reserva.findAll({
+        where: {
+            restauranteId: restaurante,
+            fecha: {
+                [Op.eq]: fecha
+            },
+        }
+    })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Ocurrio un error al obtener los restaurantes."
+            });
+        });
+};
+
 exports.update = (req, res) => {
     const id = req.params.id;
 
