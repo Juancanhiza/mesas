@@ -158,9 +158,9 @@ function validarMesa(req){
 }
 
 exports.findAvailable = (req, res) => {
-    const restaurante = req.body.restauranteId;
-    const fechaString = req.body.fecha;
-    const horario = req.body.horario;
+    const restaurante = req.query.restauranteId;
+    const fechaString = req.query.fecha;
+    const horario = req.query.horario;
     let fecha = Date.parse(fechaString);
 
     Reserva.findAll({
