@@ -60,6 +60,24 @@ exports.findAll = (req, res) => {
         });
 };
 
+exports.byCedula = (req, res) => {
+    const cedula = req.query.cedula;
+
+    Cliente.findAll({ where: { 
+            cedula: cedula
+        } 
+    })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Ocurrio un error al obtener los clientes."
+            });
+        });
+};
+
 exports.update = (req, res) => {
     const id = req.params.id;
 
